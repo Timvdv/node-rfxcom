@@ -59,4 +59,72 @@ describe('Lighting1 class', function () {
      expect(consoleSpy).toHaveBeenCalledWith('[rfxcom] on /dev/ttyUSB0 - Sent    : %s', ['07', '10', '01', '00', '43', '0E', '07', '00']);
    });
   });
+describe('.switchOn', function () {
+    beforeEach(function () {
+      lighting1 = new rfxcom.Lighting1(device, rfxcom.lighting1.ARC);
+    });
+    it('should send the correct bytes to the serialport', function (done) {
+      var sentCommandId;
+      lighting1.switchOn('C14', function (err, response, cmdId) {
+        sentCommandId = cmdId;
+        done();
+      });
+      expect(fakeSerialPort).toHaveSent([0x07, 0x10, 0x01, 0x00, 0x43, 0x0E, 0x01, 0x00]);
+      expect(sentCommandId).toEqual(0);
+    });
+    it('should accept an array deviceId', function (done) {
+      var sentCommandId;
+      lighting1.switchOn(['C', '14'], function (err, response, cmdId) {
+        sentCommandId = cmdId;
+        done();
+      });
+      expect(fakeSerialPort).toHaveSent([0x07, 0x10, 0x01, 0x00, 0x43, 0x0E, 0x01, 0x00]);
+      expect(sentCommandId).toEqual(0);
+    });
+    it('should log the bytes being sent in debug mode', function (done) {
+      var debugDevice = new rfxcom.RfxCom('/dev/ttyUSB0', {
+      port: fakeSerialPort,
+      debug: true
+    }),
+      debug = new rfxcom.Lighting1(debugDevice, rfxcom.lighting1.ARC);
+
+      var consoleSpy = spyOn(console, 'log');
+      debug.switchOn('C14', done);
+      expect(consoleSpy).toHaveBeenCalledWith('[rfxcom] on /dev/ttyUSB0 - Sent    : %s', ['07', '10', '01', '00', '43', '0E', '01', '00']);
+    });
+  });
+describe('.switchOff', function () {
+    beforeEach(function () {
+      lighting1 = new rfxcom.Lighting1(device, rfxcom.lighting1.ARC);
+    });
+    it('should send the correct bytes to the serialport', function (done) {
+      var sentCommandId;
+      lighting1.switchOff('C14', function (err, response, cmdId) {
+        sentCommandId = cmdId;
+        done();
+      });
+      expect(fakeSerialPort).toHaveSent([0x07, 0x10, 0x01, 0x00, 0x43, 0x0E, 0x00, 0x00]);
+      expect(sentCommandId).toEqual(0);
+    });
+    it('should accept an array deviceId', function (done) {
+      var sentCommandId;
+      lighting1.switchOff(['C', '14'], function (err, response, cmdId) {
+        sentCommandId = cmdId;
+        done();
+      });
+      expect(fakeSerialPort).toHaveSent([0x07, 0x10, 0x01, 0x00, 0x43, 0x0E, 0x00, 0x00]);
+      expect(sentCommandId).toEqual(0);
+    });
+    it('should log the bytes being sent in debug mode', function (done) {
+      var debugDevice = new rfxcom.RfxCom('/dev/ttyUSB0', {
+      port: fakeSerialPort,
+      debug: true
+    }),
+      debug = new rfxcom.Lighting1(debugDevice, rfxcom.lighting1.ARC);
+
+      var consoleSpy = spyOn(console, 'log');
+      debug.switchOff('C14', done);
+      expect(consoleSpy).toHaveBeenCalledWith('[rfxcom] on /dev/ttyUSB0 - Sent    : %s', ['07', '10', '01', '00', '43', '0E', '00', '00']);
+    });
+  });
 });
